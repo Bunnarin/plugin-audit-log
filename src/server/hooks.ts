@@ -54,7 +54,7 @@ export async function afterCreate(model: any, options: any) {
     const AuditLog = database.getCollection('__auditLog');
     if (!AuditLog) return;
     const currentUserId = options?.context?.state?.currentUser?.id;
-    const ip = options.context.request?.headers?.['x-forwarded-for']?.split(', ')?.[0];
+    const ip = options.context?.request?.headers?.['x-forwarded-for']?.split(', ')?.[0];
 
     let ipAddressId = null;
     if (!config?.get('skipIP') && ip) {
@@ -134,7 +134,7 @@ export async function afterUpdate(model: any, options: any) {
     const AuditLog = database.getCollection('__auditLog');
     if (!AuditLog) return;
     const currentUserId = options?.context?.state?.currentUser?.id;
-    const ip = options?.context?.ip || options?.context?.request?.ip;
+    const ip = options.context?.request?.headers?.['x-forwarded-for']?.split(', ')?.[0];
 
     let ipAddressId = null;
     if (!config?.get('skipIP') && ip) {
@@ -198,7 +198,7 @@ export async function afterDestroy(model: any, options: any) {
     const AuditLog = database.getCollection('__auditLog');
     if (!AuditLog) return;
     const currentUserId = options?.context?.state?.currentUser?.id;
-    const ip = options?.context?.ip || options?.context?.request?.ip;
+    const ip = options.context?.request?.headers?.['x-forwarded-for']?.split(', ')?.[0];
 
     let ipAddressId = null;
     if (!config?.get('skipIP') && ip) {
