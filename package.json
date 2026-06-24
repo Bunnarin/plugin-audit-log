@@ -1,0 +1,33 @@
+{
+  "name": "@bunnarin/plugin-audit-logs",
+  "version": "0.0.1",
+  "displayName": "Audit logs",
+  "displayName.ru-RU": "Журнал аудита",
+  "displayName.zh-CN": "审计日志",
+  "main": "dist/server/index.js",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@ant-design/icons": "5.x",
+    "@formily/antd-v5": "1.x",
+    "@formily/react": "2.x",
+    "@formily/shared": "2.x",
+    "react": "^18.2.0",
+    "react-i18next": "^11.15.1"
+  },
+  "peerDependencies": {
+    "@nocobase/client": "2.x",
+    "@nocobase/database": "2.x",
+    "@nocobase/server": "2.x",
+    "@nocobase/test": "2.x"
+  },
+  "keywords": [
+    "System & security"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bunnarin/plugin-auth-oidc"
+  }
+}
