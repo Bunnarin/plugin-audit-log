@@ -1,5 +1,5 @@
 {
-  "name": "@bunnarin/plugin-audit-logs",
+  "name": "@bunnarin/plugin-audit-log",
   "version": "0.0.1",
   "displayName": "Audit logs",
   "displayName.ru-RU": "Журнал аудита",
