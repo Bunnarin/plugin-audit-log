@@ -1,6 +1,6 @@
 {
   "name": "@bunnarin/plugin-audit-log",
-  "version": "2.0.3",
+  "version": "2.0.6",
   "displayName": "Audit logs",
   "displayName.ru-RU": "Журнал аудита",
   "displayName.zh-CN": "审计日志",
@@ -28,6 +28,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bunnarin/plugin-audit-log"
+    "url": "git+https://github.com/bunnarin/plugin-audit-log.git"
   }
 }

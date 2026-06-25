@@ -22,15 +22,6 @@ export default defineCollection({
             },
         },
         {
-            type: 'belongsTo',
-            name: 'collection',
-            target: 'collections',
-            targetKey: 'name',
-            sourceKey: 'id',
-            foreignKey: 'collection',
-            constraints: false,
-        },
-        {
             type: 'boolean',
             name: 'skipIP',
             interface: 'checkbox',

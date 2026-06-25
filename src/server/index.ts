@@ -35,11 +35,11 @@ export class PluginAuditLogServer extends Plugin {
       })
 
     if (type === 'create')
-      await afterCreate(model, options, ip ? ipRecord.get('id') : null);
+      await afterCreate(model, options, ipRecord ? ipRecord.get('id') : null);
     else if (type === 'update')
-      await afterUpdate(model, options, ip ? ipRecord.get('id') : null, config);
+      await afterUpdate(model, options, ipRecord ? ipRecord.get('id') : null, config);
     else if (type === 'delete')
-      await afterDestroy(model, options, ip ? ipRecord.get('id') : null);
+      await afterDestroy(model, options, ipRecord ? ipRecord.get('id') : null);
   }
 }
 
