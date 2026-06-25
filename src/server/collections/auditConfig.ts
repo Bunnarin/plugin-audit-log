@@ -9,7 +9,6 @@ export default defineCollection({
             type: 'string',
             interface: 'collection',
             name: 'collection',
-            primaryKey: true,
             unique: true,
             uiSchema: {
                 title: 'collection',
