@@ -1,4 +1,4 @@
-export async function afterDestroy(model, options, ipAddressId) {
+export async function afterDestroy(model: any, options: any, ipAddressId: number | null) {
     const { database, collection } = model.constructor
     await database.getRepository('__auditLog').create({
         values: {

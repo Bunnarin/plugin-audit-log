@@ -1,4 +1,4 @@
-export async function afterUpdate(model, options, ipAddressId, auditConfig) {
+export async function afterUpdate(model: any, options: any, ipAddressId: number | null, auditConfig: any) {
   const { collection, database } = model.constructor;
 
   // we need to know if the whitelisted fields are changed or not
@@ -9,9 +9,9 @@ export async function afterUpdate(model, options, ipAddressId, auditConfig) {
   // this can either be { blacklist } or { whitelist }
   let allowedFields: string[] = [];
   if (listenLogic?.blacklist?.length)
-    allowedFields = changedFields.filter((f) => !listenLogic.blacklist.includes(f));
+    allowedFields = changedFields.filter((f: string) => !listenLogic.blacklist.includes(f));
   else if (listenLogic?.whitelist?.length)
-    allowedFields = changedFields.filter((f) => listenLogic.whitelist.includes(f));
+    allowedFields = changedFields.filter((f: string) => listenLogic.whitelist.includes(f));
   else
     allowedFields = changedFields;
 
@@ -19,7 +19,7 @@ export async function afterUpdate(model, options, ipAddressId, auditConfig) {
 
   const changes: any[] = [];
   allowedFields.forEach((key) => {
-    const field = collection.findField((field) => {
+    const field = collection.findField((field: any) => {
       return field.name === key || field.options.field === key;
     });
     if (field && !field.options.hidden) {

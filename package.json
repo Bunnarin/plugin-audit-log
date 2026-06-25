@@ -1,6 +1,6 @@
 {
   "name": "@bunnarin/plugin-audit-log",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "displayName": "Audit logs",
   "displayName.ru-RU": "Журнал аудита",
   "displayName.zh-CN": "审计日志",

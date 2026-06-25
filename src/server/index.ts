@@ -5,21 +5,18 @@ import { afterDestroy } from './hooks/afterDestroy';
 
 export class PluginAuditLogServer extends Plugin {
   async load() {
-    this.db.on('afterCreate', (model, options) => this.afterWrite(model, options, 'create'));
-    this.db.on('afterUpdate', (model, options) => this.afterWrite(model, options, 'update'));
-    this.db.on('afterDestroy', (model, options) => this.afterWrite(model, options, 'delete'));
+    this.db.on('afterCreate', (model: any, options: any) => this.afterWrite(model, options, 'create'));
+    this.db.on('afterUpdate', (model: any, options: any) => this.afterWrite(model, options, 'update'));
+    this.db.on('afterDestroy', (model: any, options: any) => this.afterWrite(model, options, 'delete'));
   }
 
   async afterWrite(model: any, options: any, type: 'create' | 'update' | 'delete') {
     const { collection } = model.constructor;
     if (!collection) return;
 
-    console.log('filterTargetKey: ', collection.filterTargetKey)
-    console.log('primaryKeyAttribute: ', collection.model?.primaryKeyAttribute)
-
     const config = await this.db.getRepository('__auditConfig').findOne({
       filter: {
-        collectionName: collection.name
+        collection: collection.name
       }
     })
     if (!config) return;
@@ -38,11 +35,11 @@ export class PluginAuditLogServer extends Plugin {
       })
 
     if (type === 'create')
-      await afterCreate(model, options, ipRecord.get('id'));
+      await afterCreate(model, options, ipRecord?.get('id'));
     else if (type === 'update')
-      await afterUpdate(model, options, ipRecord.get('id'), config);
+      await afterUpdate(model, options, ipRecord?.get('id'), config);
     else if (type === 'delete')
-      await afterDestroy(model, options, ipRecord.get('id'));
+      await afterDestroy(model, options, ipRecord?.get('id'));
   }
 }
 

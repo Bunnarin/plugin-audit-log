@@ -3,12 +3,23 @@ import { defineCollection } from '@nocobase/database';
 export default defineCollection({
     name: '__auditConfig',
     title: 'audit config',
-    filterTargetKey: 'collectionName',
+    filterTargetKey: 'collection',
     fields: [
         {
             type: 'string',
-            name: 'collectionName',
+            interface: 'collection',
+            name: 'collection',
             primaryKey: true,
+            unique: true,
+            uiSchema: {
+                title: 'collection',
+                type: 'string',
+                'x-component': 'CollectionSelect',
+                'x-component-props': {
+                    multiple: false,
+                },
+                required: true,
+            },
         },
         {
             type: 'belongsTo',
@@ -16,25 +27,49 @@ export default defineCollection({
             target: 'collections',
             targetKey: 'name',
             sourceKey: 'id',
-            foreignKey: 'collectionName',
+            foreignKey: 'collection',
             constraints: false,
         },
         {
             type: 'boolean',
-            name: 'skipIP'
+            name: 'skipIP',
+            interface: 'checkbox',
+            uiSchema: {
+                title: 'skip ip',
+                type: 'boolean',
+                'x-component': 'Checkbox',
+            },
         },
         {
             type: 'boolean',
-            name: 'skipCreate'
+            name: 'skipCreate',
+            interface: 'checkbox',
+            uiSchema: {
+                title: 'skip create',
+                type: 'boolean',
+                'x-component': 'Checkbox',
+            },
         },
         {
             type: 'boolean',
-            name: 'skipDelete'
+            name: 'skipDelete',
+            interface: 'checkbox',
+            uiSchema: {
+                title: 'skip delete',
+                type: 'boolean',
+                'x-component': 'Checkbox',
+            },
         },
         // key will be either include all except or whitelist and value will be array of field names
         {
             type: 'json',
-            name: 'updateListenLogic'
+            name: 'updateListenLogic',
+            interface: 'json',
+            uiSchema: {
+                title: 'update listen logic',
+                type: 'object',
+                'x-component': 'JSONEditor',
+            },
         }
     ]
 })

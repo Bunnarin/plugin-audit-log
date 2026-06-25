@@ -17,7 +17,7 @@ export const AuditConfigPage = () => {
             });
             const configMap: Record<string, any> = {};
             data?.data?.forEach((item: any) => {
-                configMap[item.collectionName] = item;
+                configMap[item.collection] = item;
             });
             setConfigs(configMap);
         } catch (error) {
@@ -32,31 +32,31 @@ export const AuditConfigPage = () => {
         fetchConfigs();
     }, []);
 
-    const handleUpdate = async (collectionName: string, payload: any) => {
+    const handleUpdate = async (collection: string, payload: any) => {
         try {
-            const current = configs[collectionName] || {};
+            const current = configs[collection] || {};
             const next = { ...current, ...payload };
-            setConfigs(prev => ({ ...prev, [collectionName]: next }));
+            setConfigs(prev => ({ ...prev, [collection]: next }));
 
-            const isCreate = !current.collectionName;
+            const isCreate = !current.collection;
 
             // then update our local
             if (isCreate)
                 await api.resource('__auditConfig').create({
-                    values: { collectionName, ...payload }
+                    values: { collection, ...payload }
                 }).then(res => setConfigs(prev => ({
                     ...prev,
-                    [collectionName]: Array.isArray(res.data.data) ? res.data.data[0] : res.data.data
+                    [collection]: Array.isArray(res.data.data) ? res.data.data[0] : res.data.data
                 })))
             else
                 await api.resource('__auditConfig').update({
                     filter: {
-                        collectionName
+                        collection
                     },
                     values: payload
                 }).then(res => setConfigs(prev => ({
                     ...prev,
-                    [collectionName]: Array.isArray(res.data.data) ? res.data.data[0] : res.data.data
+                    [collection]: Array.isArray(res.data.data) ? res.data.data[0] : res.data.data
                 })))
             message.success('Config saved');
         } catch (error) {
