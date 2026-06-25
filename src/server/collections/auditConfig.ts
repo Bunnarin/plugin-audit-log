@@ -3,7 +3,7 @@ import { defineCollection } from '@nocobase/database';
 export default defineCollection({
     name: '__auditConfig',
     title: 'audit config',
-    filterTargetKey: 'collection',
+    uiManageable: true,
     fields: [
         {
             type: 'string',

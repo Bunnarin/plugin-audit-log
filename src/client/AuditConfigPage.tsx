@@ -66,6 +66,28 @@ export const AuditConfigPage = () => {
         }
     };
 
+    const handleDelete = async (collection: string) => {
+        try {
+            const current = configs[collection];
+            if (!current) return;
+            
+            setConfigs(prev => {
+                const next = { ...prev };
+                delete next[collection];
+                return next;
+            });
+
+            await api.resource('__auditConfig').destroy({
+                filter: { collection }
+            });
+            message.success('Config deleted');
+        } catch (error) {
+            console.error(error);
+            message.error('Failed to delete config');
+            fetchConfigs();
+        }
+    };
+
     // Filter out internal audit log collections to prevent infinite loops and clutter
     const filteredCollections = useMemo(() => {
         return collections.filter(c => !c.name.startsWith('__audit') && c.name !== '__ipAddress');
@@ -91,8 +113,9 @@ export const AuditConfigPage = () => {
             dataIndex: 'skipIP',
             key: 'skipIP',
             render: (_: any, record: any) => {
+                const configExists = !!configs[record.name];
                 const checked = configs[record.name]?.skipIP || false;
-                return <Switch checked={checked} onChange={(v) => handleUpdate(record.name, { skipIP: v })} />;
+                return <Switch disabled={!configExists} checked={checked} onChange={(v) => handleUpdate(record.name, { skipIP: v })} />;
             }
         },
         {
@@ -100,8 +123,9 @@ export const AuditConfigPage = () => {
             dataIndex: 'skipCreate',
             key: 'skipCreate',
             render: (_: any, record: any) => {
+                const configExists = !!configs[record.name];
                 const checked = configs[record.name]?.skipCreate || false;
-                return <Switch checked={checked} onChange={(v) => handleUpdate(record.name, { skipCreate: v })} />;
+                return <Switch disabled={!configExists} checked={checked} onChange={(v) => handleUpdate(record.name, { skipCreate: v })} />;
             }
         },
         {
@@ -109,8 +133,9 @@ export const AuditConfigPage = () => {
             dataIndex: 'skipDelete',
             key: 'skipDelete',
             render: (_: any, record: any) => {
+                const configExists = !!configs[record.name];
                 const checked = configs[record.name]?.skipDelete || false;
-                return <Switch checked={checked} onChange={(v) => handleUpdate(record.name, { skipDelete: v })} />;
+                return <Switch disabled={!configExists} checked={checked} onChange={(v) => handleUpdate(record.name, { skipDelete: v })} />;
             }
         },
         {
@@ -118,9 +143,10 @@ export const AuditConfigPage = () => {
             dataIndex: 'updateListenLogic',
             key: 'updateListenLogic',
             render: (_: any, record: any) => {
+                const configExists = !!configs[record.name];
                 const config = configs[record.name]?.updateListenLogic || {};
-                const mode = config['blacklist'] ? 'include' : (config['whitelist'] ? 'exclude' : 'none');
-                const fields = mode === 'include' ? config['blacklist'] : (mode === 'exclude' ? config['whitelist'] : []);
+                const mode = !configExists ? 'none' : (config['blacklist'] ? 'blacklist' : (config['whitelist'] ? 'whitelist' : 'none'));
+                const fields = mode === 'blacklist' ? config['blacklist'] : (mode === 'whitelist' ? config['whitelist'] : []);
 
                 // Filter out association fields
                 const availableFields = record.fields?.filter((f: any) => {
@@ -134,19 +160,19 @@ export const AuditConfigPage = () => {
                             value={mode}
                             onChange={(v) => {
                                 if (v === 'none') {
-                                    handleUpdate(record.name, { updateListenLogic: null });
+                                    handleDelete(record.name);
                                 } else {
                                     handleUpdate(record.name, {
                                         updateListenLogic: {
-                                            [v === 'include' ? 'blacklist' : 'whitelist']: []
+                                            [v]: []
                                         }
                                     });
                                 }
                             }}
                             options={[
-                                { label: 'Log nothing (Default)', value: 'none' },
-                                { label: 'blacklist', value: 'include' },
-                                { label: 'whitelist', value: 'exclude' },
+                                { label: 'Unconfigured (Log nothing)', value: 'none' },
+                                { label: 'Blacklist', value: 'blacklist' },
+                                { label: 'Whitelist', value: 'whitelist' },
                             ]}
                         />
                         {mode !== 'none' && (
@@ -158,7 +184,7 @@ export const AuditConfigPage = () => {
                                 onChange={(selected) => {
                                     handleUpdate(record.name, {
                                         updateListenLogic: {
-                                            [mode === 'include' ? 'blacklist' : 'whitelist']: selected
+                                            [mode]: selected
                                         }
                                     });
                                 }}
@@ -180,6 +206,13 @@ export const AuditConfigPage = () => {
 
     return (
         <div style={{ padding: '24px' }}>
+            <style>{`
+                .audit-config-disabled-row {
+                    opacity: 0.5;
+                    background-color: #fafafa;
+                    transition: all 0.3s;
+                }
+            `}</style>
             <h2>Audit Log Configuration</h2>
             <Table
                 dataSource={filteredCollections}
@@ -187,6 +220,7 @@ export const AuditConfigPage = () => {
                 rowKey="name"
                 pagination={false}
                 bordered
+                rowClassName={(record) => !configs[record.name] ? 'audit-config-disabled-row' : ''}
             />
         </div>
     );
