@@ -3,11 +3,14 @@ import { defineCollection } from '@nocobase/database';
 export default defineCollection({
     name: '__auditConfig',
     title: 'audit config',
+    autoGenId: true,
     fields: [
         {
             type: 'string',
             name: 'collectionName',
             primaryKey: true,
+            unique: true,
+            allowNull: false
         },
         {
             type: 'belongsTo',
@@ -30,7 +33,7 @@ export default defineCollection({
             type: 'boolean',
             name: 'skipDelete'
         },
-        // key will be either include all except or exclude all except and value will be array of field names
+        // key will be either include all except or whitelist and value will be array of field names
         {
             type: 'json',
             name: 'updateListenLogic'

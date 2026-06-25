@@ -9,26 +9,19 @@ export default defineCollection({
     createdAt: false,
     updatedAt: false,
     shared: true,
+    autoGenId: true,
     fields: [
         {
-            type: 'integer',
-            name: 'id',
+            autoIncrement: true,
             primaryKey: true,
             interface: 'integer',
-            uiSchema: {
-                "type": "number",
-                "x-component": "InputNumber",
-                "x-component-props": {
-                    "stringMode": true,
-                    "step": "1"
-                },
-                "x-validator": "integer",
-                "title": "ID"
-            }
+            name: 'id',
+            type: 'integer',
         },
         {
             type: 'string',
             name: 'fieldName',
+            allowNull: false,
             interface: 'input',
             uiSchema: {
                 type: "string",
@@ -40,11 +33,12 @@ export default defineCollection({
             type: 'text',
             length: 'long',
             name: 'before',
+            allowNull: false,
             interface: 'textarea',
             uiSchema: {
                 type: "string",
                 "x-component": "Input.TextArea",
-                "title": "value"
+                "title": "before"
             }
         },
         {
@@ -55,12 +49,13 @@ export default defineCollection({
             uiSchema: {
                 type: "string",
                 "x-component": "Input.TextArea",
-                "title": "value"
+                "title": "after"
             }
         },
         {
             type: 'integer',
             name: 'auditLogId',
+            allowNull: false,
             interface: 'integer',
             isForeignKey: true,
             uiSchema: {
@@ -74,7 +69,8 @@ export default defineCollection({
             type: 'belongsTo',
             name: 'log',
             interface: 'm2o',
-            target: 'auditLog',
+            target: '__auditLog',
+            targetKey: 'id',
             foreignKey: 'auditLogId',
             uiSchema: {
                 "x-component": "AssociationField",

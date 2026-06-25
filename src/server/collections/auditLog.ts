@@ -10,22 +10,14 @@ export default defineCollection({
     updatedBy: false,
     updatedAt: false,
     shared: true,
+    autoGenId: true,
     fields: [
         {
-            type: 'integer',
-            name: 'id',
+            autoIncrement: true,
             primaryKey: true,
             interface: 'integer',
-            uiSchema: {
-                "type": "number",
-                "x-component": "InputNumber",
-                "x-component-props": {
-                    "stringMode": true,
-                    "step": "1"
-                },
-                "x-validator": "integer",
-                "title": "ID"
-            }
+            name: 'id',
+            type: 'integer',
         },
         {
             type: 'string',
@@ -72,6 +64,7 @@ export default defineCollection({
             type: 'string',
             interface: 'collection',
             name: 'collection',
+            allowNull: false,
             uiSchema: {
                 title: 'collection',
                 type: 'string',

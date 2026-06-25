@@ -1,0 +1,191 @@
+import React, { useEffect, useState, useMemo } from 'react';
+import { useCollectionManager, useAPIClient } from '@nocobase/client';
+import { Table, Switch, Select, Spin, message, Typography } from 'antd';
+
+export const AuditConfigPage = () => {
+    const collectionManager = useCollectionManager();
+    const collections = collectionManager.getCollections();
+    const api = useAPIClient();
+    const [configs, setConfigs] = useState<Record<string, any>>({});
+    const [loading, setLoading] = useState(true);
+
+    const fetchConfigs = async () => {
+        try {
+            setLoading(true);
+            const { data } = await api.resource('__auditConfig').list({
+                paginate: false,
+            });
+            const configMap: Record<string, any> = {};
+            data?.data?.forEach((item: any) => {
+                configMap[item.collectionName] = item;
+            });
+            setConfigs(configMap);
+        } catch (error) {
+            console.error(error);
+            message.error('Failed to fetch audit configs');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchConfigs();
+    }, []);
+
+    const handleUpdate = async (collectionName: string, payload: any) => {
+        try {
+            const current = configs[collectionName] || {};
+            const next = { ...current, ...payload };
+            setConfigs(prev => ({ ...prev, [collectionName]: next }));
+
+            const isCreate = !current.collectionName;
+
+            // then update our local
+            if (isCreate)
+                await api.resource('__auditConfig').create({
+                    values: { collectionName, ...payload }
+                }).then(res => setConfigs(prev => ({
+                    ...prev,
+                    [collectionName]: res.data.data
+                })))
+            else
+                await api.resource('__auditConfig').update({
+                    filterByTk: collectionName,
+                    values: payload
+                }).then(res => setConfigs(prev => ({
+                    ...prev,
+                    [collectionName]: res.data.data
+                })))
+            message.success('Config saved');
+        } catch (error) {
+            console.error(error);
+            message.error('Failed to save config');
+            fetchConfigs(); // revert on fail
+        }
+    };
+
+    // Filter out internal audit log collections to prevent infinite loops and clutter
+    const filteredCollections = useMemo(() => {
+        return collections.filter(c => !c.name.startsWith('__audit') && c.name !== '__ipAddress');
+    }, [collections]);
+
+    const columns = [
+        {
+            title: 'Collection',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text: string, record: any) => {
+                return (
+                    <div>
+                        <Typography.Text strong>{record.title || text}</Typography.Text>
+                        <br />
+                        <Typography.Text type="secondary">{text}</Typography.Text>
+                    </div>
+                );
+            }
+        },
+        {
+            title: 'Skip IP',
+            dataIndex: 'skipIP',
+            key: 'skipIP',
+            render: (_: any, record: any) => {
+                const checked = configs[record.name]?.skipIP || false;
+                return <Switch checked={checked} onChange={(v) => handleUpdate(record.name, { skipIP: v })} />;
+            }
+        },
+        {
+            title: 'Skip Create',
+            dataIndex: 'skipCreate',
+            key: 'skipCreate',
+            render: (_: any, record: any) => {
+                const checked = configs[record.name]?.skipCreate || false;
+                return <Switch checked={checked} onChange={(v) => handleUpdate(record.name, { skipCreate: v })} />;
+            }
+        },
+        {
+            title: 'Skip Delete',
+            dataIndex: 'skipDelete',
+            key: 'skipDelete',
+            render: (_: any, record: any) => {
+                const checked = configs[record.name]?.skipDelete || false;
+                return <Switch checked={checked} onChange={(v) => handleUpdate(record.name, { skipDelete: v })} />;
+            }
+        },
+        {
+            title: 'Update Listen Logic',
+            dataIndex: 'updateListenLogic',
+            key: 'updateListenLogic',
+            render: (_: any, record: any) => {
+                const config = configs[record.name]?.updateListenLogic || {};
+                const mode = config['blacklist'] ? 'include' : (config['whitelist'] ? 'exclude' : 'none');
+                const fields = mode === 'include' ? config['blacklist'] : (mode === 'exclude' ? config['whitelist'] : []);
+
+                // Filter out association fields
+                const availableFields = record.fields?.filter((f: any) => {
+                    const type = f.type;
+                    return !['hasOne', 'hasMany', 'belongsTo', 'belongsToMany'].includes(type);
+                }) || [];
+
+                return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '250px' }}>
+                        <Select
+                            value={mode}
+                            onChange={(v) => {
+                                if (v === 'none') {
+                                    handleUpdate(record.name, { updateListenLogic: null });
+                                } else {
+                                    handleUpdate(record.name, {
+                                        updateListenLogic: {
+                                            [v === 'include' ? 'blacklist' : 'whitelist']: []
+                                        }
+                                    });
+                                }
+                            }}
+                            options={[
+                                { label: 'Log nothing (Default)', value: 'none' },
+                                { label: 'blacklist', value: 'include' },
+                                { label: 'whitelist', value: 'exclude' },
+                            ]}
+                        />
+                        {mode !== 'none' && (
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                placeholder="Select fields"
+                                value={fields}
+                                onChange={(selected) => {
+                                    handleUpdate(record.name, {
+                                        updateListenLogic: {
+                                            [mode === 'include' ? 'blacklist' : 'whitelist']: selected
+                                        }
+                                    });
+                                }}
+                                options={availableFields.map((f: any) => ({
+                                    label: f.title || f.name,
+                                    value: f.name
+                                }))}
+                            />
+                        )}
+                    </div>
+                );
+            }
+        }
+    ];
+
+    if (loading && Object.keys(configs).length === 0) {
+        return <Spin style={{ margin: '20px' }} />;
+    }
+
+    return (
+        <div style={{ padding: '24px' }}>
+            <h2>Audit Log Configuration</h2>
+            <Table
+                dataSource={filteredCollections}
+                columns={columns}
+                rowKey="name"
+                pagination={false}
+                bordered
+            />
+        </div>
+    );
+};
