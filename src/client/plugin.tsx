@@ -6,8 +6,8 @@ export class PluginAuditLogClient extends Plugin {
   async load() {
     this.flowEngine?.registerModels?.(models);
 
-    this.app.pluginSettingsManager.add('audit-log', {
-      title: 'Audit Log Settings',
+    this.app.pluginSettingsManager.add('audit-log-config', {
+      title: 'Audit Log Config',
       icon: 'SettingOutlined',
       Component: AuditConfigPage,
     });

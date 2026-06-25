@@ -8,12 +8,10 @@ export async function afterUpdate(model: any, options: any, ipAddressId: number 
   const listenLogic = auditConfig.get('updateListenLogic');
   // this can either be { blacklist } or { whitelist }
   let allowedFields: string[] = [];
-  if (listenLogic?.blacklist?.length)
+  if (Array.isArray(listenLogic?.blacklist))
     allowedFields = changedFields.filter((f: string) => !listenLogic.blacklist.includes(f));
-  else if (listenLogic?.whitelist?.length)
+  else if (Array.isArray(listenLogic?.whitelist))
     allowedFields = changedFields.filter((f: string) => listenLogic.whitelist.includes(f));
-  else
-    allowedFields = changedFields;
 
   if (allowedFields.length == 0) return;
 
@@ -22,13 +20,12 @@ export async function afterUpdate(model: any, options: any, ipAddressId: number 
     const field = collection.findField((field: any) => {
       return field.name === key || field.options.field === key;
     });
-    if (field && !field.options.hidden) {
+    if (field && !field.options.hidden)
       changes.push({
         fieldName: key,
         before: stringifyValue(model.previous(key)),
         after: stringifyValue(model.get(key)),
       });
-    }
   });
 
   const transaction = options.transaction

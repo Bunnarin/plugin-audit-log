@@ -25,7 +25,7 @@ export class PluginAuditLogServer extends Plugin {
 
     // get ip
     const ip = options.context?.request?.headers?.['x-forwarded-for']?.split(', ')?.[0];
-    let ipRecord: any;
+    let ipRecord = null;
     if (ip && !config.get('skipIP'))
       ipRecord = await this.db.getRepository('__ipAddress').firstOrCreate({
         filterKeys: ['ip'],
@@ -35,11 +35,11 @@ export class PluginAuditLogServer extends Plugin {
       })
 
     if (type === 'create')
-      await afterCreate(model, options, ipRecord?.get('id'));
+      await afterCreate(model, options, ip ? ipRecord.get('id') : null);
     else if (type === 'update')
-      await afterUpdate(model, options, ipRecord?.get('id'), config);
+      await afterUpdate(model, options, ip ? ipRecord.get('id') : null, config);
     else if (type === 'delete')
-      await afterDestroy(model, options, ipRecord?.get('id'));
+      await afterDestroy(model, options, ip ? ipRecord.get('id') : null);
   }
 }
 
