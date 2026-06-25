@@ -31,7 +31,7 @@ export class PluginAuditLogServer extends Plugin {
     let ipRecord: any;
     if (ip && !config.get('skipIP'))
       ipRecord = await this.db.getRepository('__ipAddress').firstOrCreate({
-        filterKeys: ['id'],
+        filterKeys: ['ip'],
         values: {
           ip
         }

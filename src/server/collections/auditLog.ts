@@ -20,8 +20,23 @@ export default defineCollection({
             type: 'integer',
         },
         {
+            type: 'date',
+            name: 'createdAt',
+            interface: 'createdAt',
+            field: 'createdAt',
+            uiSchema: {
+                type: 'datetime',
+                title: 'created at',
+                'x-component': 'DatePicker',
+                'x-component-props': {
+                },
+                'x-read-pretty': true
+            }
+        },
+        {
             type: 'string',
             name: 'recordId',
+            allowNull: false,
             interface: 'input',
             uiSchema: {
                 title: 'record id',
@@ -79,7 +94,7 @@ export default defineCollection({
             type: 'hasMany',
             name: 'changes',
             interface: 'o2m',
-            target: 'auditChanges',
+            target: '__auditChange',
             foreignKey: 'auditLogId',
             uiSchema: {
                 "x-component": "AssociationField",

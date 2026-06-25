@@ -46,15 +46,17 @@ export const AuditConfigPage = () => {
                     values: { collectionName, ...payload }
                 }).then(res => setConfigs(prev => ({
                     ...prev,
-                    [collectionName]: res.data.data
+                    [collectionName]: Array.isArray(res.data.data) ? res.data.data[0] : res.data.data
                 })))
             else
                 await api.resource('__auditConfig').update({
-                    filterByTk: collectionName,
+                    filter: {
+                        collectionName
+                    },
                     values: payload
                 }).then(res => setConfigs(prev => ({
                     ...prev,
-                    [collectionName]: res.data.data
+                    [collectionName]: Array.isArray(res.data.data) ? res.data.data[0] : res.data.data
                 })))
             message.success('Config saved');
         } catch (error) {

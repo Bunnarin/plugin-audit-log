@@ -3,14 +3,12 @@ import { defineCollection } from '@nocobase/database';
 export default defineCollection({
     name: '__auditConfig',
     title: 'audit config',
-    autoGenId: true,
+    filterTargetKey: 'collectionName',
     fields: [
         {
             type: 'string',
             name: 'collectionName',
             primaryKey: true,
-            unique: true,
-            allowNull: false
         },
         {
             type: 'belongsTo',
